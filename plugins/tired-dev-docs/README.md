@@ -47,6 +47,42 @@ cp -r /tmp/malanjp-skills/plugins/tired-dev-docs ~/.claude/skills/tired-dev-docs
 報告、Issue 起票、レビュー指摘、推敲を依頼すると自動で参照される。
 スキル名を明示する必要はない。
 
+## 検証
+
+規約が守られているかを 3 つの層で確かめる。依存パッケージは追加していない。
+
+```bash
+# 前提: plugins/tired-dev-docs で実行
+npm test          # フックの判定と規約チェッカのテスト
+npm run lint      # 規約本体が自身の規約を満たすかの検査
+```
+
+`tools/lint.js` は書いてはいけない表現を検出する。
+曖昧な数量詞、全角かっこ、漢字の連結、二重否定、接続詞の連鎖などを行単位で指摘する。
+受動態の判別や事実と仮説の分離は正規表現では偽陽性が多いため、意図的に対象から外してある。
+
+`tools/score.js` は書いてあるべき要素の充足を測る。
+冒頭の結論、ファイルと行番号、実行できる検証コマンド、受け入れ条件、影響範囲などを見る。
+
+```bash
+node tools/lint.js draft.md
+node tools/score.js draft.md --expect bluf,file-ref,run-command
+```
+
+## 規約の効果を測る
+
+`eval/` は同じ課題を規約あり / なしの 2 条件で書かせ、上の 2 つで採点する。
+
+```bash
+# 前提: plugins/tired-dev-docs で実行。claude CLI と課金が必要
+node eval/run.js --model sonnet
+node eval/run.js --report          # 生成済みの出力を採点し直す
+```
+
+生成は必ずリポジトリの外の一時ディレクトリで走らせる。
+同じ作業ツリーで走らせると、このリポジトリ向けのフックが子プロセスの `claude` に効き、
+ブロックメッセージが生成物に混ざって、文章ではなく実行環境を測ることになる。
+
 ## ライセンス
 
 MIT
