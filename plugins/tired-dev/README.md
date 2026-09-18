@@ -1,4 +1,4 @@
-# tired-dev-docs
+# tired-dev
 
 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。
 報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントに適用する。
@@ -25,7 +25,7 @@ CLI を使わない場合は、エージェントがスキルを読むディレ�
 
 ```bash
 git clone git@github.com:malanjp/skills.git /tmp/malanjp-skills
-cp -r /tmp/malanjp-skills/plugins/tired-dev-docs ~/.claude/skills/tired-dev-docs
+cp -r /tmp/malanjp-skills/plugins/tired-dev ~/.claude/skills/tech-writing
 ```
 
 ## Claude Code のセッション全体に適用する
@@ -36,7 +36,7 @@ cp -r /tmp/malanjp-skills/plugins/tired-dev-docs ~/.claude/skills/tired-dev-docs
 
 ```
 /plugin marketplace add malanjp/skills
-/plugin install tired-dev-docs@malanjp
+/plugin install tired-dev@malanjp
 ```
 
 チャット返答の口調には干渉しない。
@@ -46,13 +46,14 @@ cp -r /tmp/malanjp-skills/plugins/tired-dev-docs ~/.claude/skills/tired-dev-docs
 
 報告、Issue 起票、レビュー指摘、推敲を依頼すると自動で参照される。
 スキル名を明示する必要はない。
+明示するときは `/tired-dev:tech-writing` と呼ぶ。
 
 ## 検証
 
 規約が守られているかを 3 つの層で確かめる。依存パッケージは追加していない。
 
 ```bash
-# 前提: plugins/tired-dev-docs で実行
+# 前提: plugins/tired-dev で実行
 npm test          # フックの判定と規約チェッカのテスト
 npm run lint      # 規約本体が自身の規約を満たすかの検査
 ```
@@ -75,7 +76,7 @@ node tools/score.js draft.md --expect bluf,file-ref,run-command
 `eval/` は同じ課題を規約あり / なしの 2 条件で書かせ、上の 2 つで採点する。
 
 ```bash
-# 前提: plugins/tired-dev-docs で実行。claude CLI と課金が必要
+# 前提: plugins/tired-dev で実行。claude CLI と課金が必要
 node eval/run.js --runs 5 --model sonnet   # 各条件 5 回ずつ生成する
 node eval/run.js --report                  # 生成済みの出力を採点し直す
 ```

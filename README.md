@@ -5,9 +5,9 @@ malanjp が使う Claude Code プラグインとスキルを置くリポジト�
 
 ## 収録プラグイン
 
-| プラグイン | 内容 |
-|---|---|
-| [`tired-dev-docs`](plugins/tired-dev-docs/) | 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約 |
+| プラグイン | 収録スキル | 内容 |
+|---|---|---|
+| [`tired-dev`](plugins/tired-dev/) | `tech-writing` | 疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約 |
 
 ## Claude Code に導入する
 
@@ -15,7 +15,7 @@ malanjp が使う Claude Code プラグインとスキルを置くリポジト�
 
 ```
 /plugin marketplace add malanjp/skills
-/plugin install tired-dev-docs@malanjp
+/plugin install tired-dev@malanjp
 ```
 
 各プラグインの詳細と、プラグインを使わずスキルとして導入する手順は、

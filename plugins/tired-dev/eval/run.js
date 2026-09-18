@@ -52,7 +52,7 @@ function buildPrompt(condition, caseText) {
 async function generate(prompt, model) {
   const args = ['-p', prompt, '--restricted'];
   if (model) args.push('--model', model);
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'tired-dev-docs-eval-'));
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'tired-dev-eval-'));
   try {
     const { stdout } = await execFileAsync('claude', args, {
       cwd,
