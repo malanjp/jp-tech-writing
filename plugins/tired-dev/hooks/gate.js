@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// tired-dev-docs — UserPromptSubmit フック
+// tired-dev — UserPromptSubmit フック
 //
 // プロンプトが日本語の共有文章を書く依頼に該当するときだけ、
 // rules/anchor.md を注入する。該当しないプロンプトでは何も出力せず、
@@ -43,7 +43,7 @@ const JA_THRESHOLD = 200;
 
 function statePath() {
   const dir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
-  return path.join(dir, '.tired-dev-docs-state.json');
+  return path.join(dir, '.tired-dev-state.json');
 }
 
 // セッションごとの命中回数を記録する。読み書きに失敗しても本処理は止めない。
@@ -84,7 +84,7 @@ function main() {
   const count = bumpHitCount(input.session_id);
   if (count > 1) {
     process.stdout.write(
-      '共有される文章を書く場合は tired-dev-docs の規約を適用する。結論を冒頭に置き、' +
+      '共有される文章を書く場合は tired-dev:tech-writing の規約を適用する。結論を冒頭に置き、' +
         '事実と仮説と対応方針を分け、定量的に書き、そのまま実行できる検証コマンドと' +
         `受け入れ条件を添える。詳細は ${path.join(ROOT, 'SKILL.md')} にある。`
     );

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// tired-dev-docs の規約チェッカ。
+// tech-writing の規約チェッカ。
 //
 // 使い方:
 //   node tools/lint.js <file...>          違反を人が読む形式で出す

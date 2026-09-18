@@ -65,7 +65,7 @@ test('同一セッションの 2 回目はアンカー全文ではなくリマ�
 
   assert.ok(first.includes('アンカー'), '1 回目にアンカー全文が出ていない');
   assert.ok(!second.includes('アンカー'), '2 回目にアンカー全文が再掲された');
-  assert.ok(second.includes('tired-dev-docs'), '2 回目のリマインダにスキル名がない');
+  assert.ok(second.includes('tech-writing'), '2 回目のリマインダにスキル名がない');
   assert.ok(second.length < first.length, '2 回目が 1 回目より短くなっていない');
 });
 
@@ -80,7 +80,7 @@ test('セッションが違えば再びアンカー全文を出す', () => {
 test('状態ファイルは CLAUDE_CONFIG_DIR の下にだけ作られる', () => {
   const dir = makeConfigDir();
   runHook('gate', { prompt: '推敲して', session_id: 'state-check' }, dir);
-  const statePath = path.join(dir, '.tired-dev-docs-state.json');
+  const statePath = path.join(dir, '.tired-dev-state.json');
   assert.ok(fs.existsSync(statePath), '状態ファイルが指定ディレクトリに作られていない');
   const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
   assert.equal(state['state-check'], 1);
@@ -92,7 +92,7 @@ test('状態ファイルは直近 20 セッション分に収まる', () => {
     runHook('gate', { prompt: '推敲して', session_id: `bulk-${i}` }, dir);
   }
   const state = JSON.parse(
-    fs.readFileSync(path.join(dir, '.tired-dev-docs-state.json'), 'utf8')
+    fs.readFileSync(path.join(dir, '.tired-dev-state.json'), 'utf8')
   );
   assert.ok(Object.keys(state).length <= 20, `セッション数が上限を超えた: ${Object.keys(state).length}`);
 });
@@ -107,7 +107,7 @@ test('プロンプトが空、または欠落していても落ちない', () =>
 test('SessionStart は適用対象と正本のパスを通知する', () => {
   const dir = makeConfigDir();
   const out = runHook('activate', {}, dir);
-  assert.ok(out.startsWith('tired-dev-docs 有効。'), '通知がスキル名から始まっていない');
+  assert.ok(out.startsWith('tired-dev:tech-writing 有効。'), '通知がスキル名から始まっていない');
   assert.ok(out.includes('SKILL.md'), '正本のパスが含まれていない');
   assert.ok(out.includes('anchor.md'), '要約のパスが含まれていない');
 });

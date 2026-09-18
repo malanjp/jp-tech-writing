@@ -10,9 +10,9 @@ const path = require('node:path');
 const PLUGIN_ROOT = path.resolve(__dirname, '..');
 
 // テストごとに独立した状態ディレクトリを作る。
-// gate.js はここに .tired-dev-docs-state.json を書く。
+// gate.js はここに .tired-dev-state.json を書く。
 function makeConfigDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'tired-dev-docs-test-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'tired-dev-test-'));
 }
 
 function runHook(hookName, input, configDir) {
