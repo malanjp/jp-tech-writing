@@ -1,205 +1,36 @@
-# japanese-writing
+# jp-tech-writing
 
-日本語の文章を、意味を変えずに明確で読みやすく編集する Claude 用スキル。
+報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントを日本語で書くための記述規約。
+AI エージェントが出力する文章と、人が書いた原稿の推敲の両方に適用する。
 
-他者が書いた原稿の推敲・校正と、Claude 自身が日本語の長文を出力する前の自己適用の両方に使う。自己適用では、冗長な定型・空の前置き・過剰な三項列挙に加え、二項対立の定型や偽の行為者といった生成 AI 特有の癖も除く。
+判断の基準は一つだけ置く。
+疲れているエンジニアが一読で理解でき、迷わず安全に次の行動に移せる文章かどうか。
 
-## ファイル構成
-
-```text
-japanese-writing/
-├── SKILL.md                        # 規則の正本。編集ワークフロー、出力モード、安全上の境界
-├── README.md                       # このファイル
-├── CLAUDE.md                       # スキル開発・保守用
-├── .claude-plugin/plugin.json      # Claude Code プラグイン定義（フック登録）
-├── commands/japanese-writing.md    # /japanese-writing モード切替
-├── hooks/                          # SessionStart / UserPromptSubmit
-├── rules/japanese-writing-anchor.md # フック注入用の短い要約（正本ではない）
-├── skills/japanese-writing/SKILL.md # プラグイン入口（ルート SKILL.md へ委譲）
-├── references/
-│   ├── document-structure.md
-│   ├── genre-guidance.md
-│   ├── claude-tics.md
-│   └── communication-clarity.md
-└── docs/
-    ├── README.md
-    ├── design/
-    └── evals/
-```
-
-規則本文の正本はルートの `SKILL.md` と `references/` のみ。`skills/` 配下と `rules/` のアンカーへ規則を複製しない。
+規則の全文と標準出力フォーマットは `SKILL.md` にある。
+README に規則を複製しない。
 
 ## インストール
 
-### 方法1: Claude Code プラグイン（フック付き・推奨）
-
-このリポジトリ自体が marketplace カタログ（`.claude-plugin/marketplace.json`）を持つ。Claude Code 内で:
-
-```text
-/plugin marketplace add malanjp/japanese-writing
-/plugin install japanese-writing@japanese-writing
-```
-
-導入後、セッション開始時に既定モード `watch`（ゲート監視）が有効になる。フル `SKILL.md` は常時注入しない。日本語長文・推敲依頼・PR 説明作成を検知したときだけ短いリマインダを足す。
-
-開発中の一時利用:
+[skills CLI](https://github.com/vercel-labs/skills) を使う。
+`-g` を付けるとユーザー全体のスキルディレクトリに入り、すべてのプロジェクトで使える。
+`-a` には使用するエージェントを指定する。
 
 ```bash
-claude --plugin-dir /path/to/japanese-writing
+npx skills add malanjp/jp-tech-writing -g -a claude-code
 ```
 
-公式プラグインディレクトリ（全ユーザー向け）へ載せる場合は、公開リポジトリが前提となる。[Console の提出フォーム](https://platform.claude.com/plugins/submit) か [claude.ai の提出フォーム](https://claude.ai/admin-settings/directory/submissions/plugins/new) から申請する。提出前に `claude plugin validate . --strict` で検証する。
-
-### 方法2: skills CLI（従来どおり）
-
-[skills CLI](https://github.com/vercel-labs/skills) を使う。`-g` を付けると `~/.claude/skills/` に入り、すべてのプロジェクトで使える。フックは付かない。
+CLI を使わない場合は、エージェントがスキルを読むディレクトリへ直接配置してもよい。
+配置後、エージェントを再起動すると読み込まれる。
 
 ```bash
-npx skills add malanjp/japanese-writing -g -a claude-code
+git clone git@github.com:malanjp/jp-tech-writing.git ~/.claude/skills/jp-tech-writing
 ```
-
-特定のリポジトリだけで使う場合は `-g` を外す。そのリポジトリの `.claude/skills/` に入る。
-
-```bash
-npx skills update japanese-writing
-npx skills remove japanese-writing
-```
-
-CLI を使わない場合は、直接配置してもよい。
-
-```bash
-git clone git@github.com:malanjp/japanese-writing.git ~/.claude/skills/japanese-writing
-```
-
-配置後、Claude Code を再起動すると読み込まれる。
 
 ## 使い方
 
-推敲、校正、リライトを依頼すると自動で参照される。スキル名を明示する必要はない。
+報告、Issue 起票、レビュー指摘、推敲を依頼すると自動で参照される。
+スキル名を明示する必要はない。
 
-- 「この文章を推敲して」
-- 「てにをはを直して」
-- 「読みやすくして」
+## ライセンス
 
-プラグイン利用時は次でも切替できる。
-
-```text
-/japanese-writing           # review でロック（毎ターン短リマインダ）
-/japanese-writing quick
-/japanese-writing strict
-/japanese-writing watch     # ゲート監視に戻す（既定）
-/japanese-writing off       # 完全停止
-```
-
-自然言語では「japanese-writing やめて」「推敲モード解除」で `off` になる。
-
-### フックのモード
-
-| モード | 動作 |
-|--------|------|
-| `watch` | 既定。推敲依頼、PR 説明 / Issue 作成、日本語長文の生成・編集っぽい発話のときだけ短リマインダ |
-| `quick` / `review` / `strict` | 明示ロック。毎ターン短リマインダ。出力形式は既存の出力モードと同じ |
-| `off` | 注入なし |
-
-既定モードの上書き（任意）:
-
-```bash
-export JAPANESE_WRITING_DEFAULT_MODE=watch   # watch | quick | review | strict | off
-```
-
-または `~/.config/japanese-writing/config.json`:
-
-```json
-{ "defaultMode": "watch" }
-```
-
-状態フラグは `~/.claude/.japanese-writing-active`。チャット口調の圧縮は genshijin、共有される日本語本文の編集基準は japanese-writing。
-
-### 出力モード
-
-指定しなければ `review` になる。
-
-- `quick`: 修正文のみ。必要なら短い注意を一つ添える
-- `review`: 修正文、確定的な指摘、任意の助言、意味保持チェック
-- `strict`: 原文の不明点、保護対象、変更差分、警告。意味が変わり得る箇所は修正せず確認事項にする
-
-契約文や障害対応手順など安全上の境界に該当する文書と、読み手が内容を根拠に、取り消しにくい判断を行う文書は、指定がなくても `strict` になる。数値を引用するだけの技術記事や社内の週報は該当しない。これらの文書で `quick` を指定した場合も、意味に関わる警告は添える。`strict` の文書性質判定はフックではなく `SKILL.md` 側で行う。
-
-## 使用例
-
-社内向けの報告文を `review` で推敲した例を示す。
-
-**原文**
-
-> 先日実施いたしましたシステムメンテナンスにつきまして、その結果をご報告させていただきます。今回の対応により、レスポンス速度が大幅に改善され、ユーザー体験の向上、運用コストの削減、および将来的な拡張性の確保が期待されます。なお、一部の機能につきましては、引き続き調査を行っている状況でございます。問題はインフラではない。運用設計だ。そこにこそ改善の本質があります。
-
-**修正文**
-
-> 先日実施したシステムメンテナンスの結果を報告します。今回の対応でレスポンス速度が大幅に改善しました。一部の機能は引き続き調査中です。問題は運用設計である。
-
-**指摘と助言**
-
-```text
-〔指摘〕「大幅に」の程度を裏づける計測値が原文にない。改善幅を示すか、示せなければ「改善した」に直す。原文だけでは判断が付かないため、修正文では「大幅に」を残している
-〔指摘〕「先日」は読み手によって指す日が変わる。実施日に置き換える。日付が原文にないため補っていない
-〔助言〕「ご報告させていただきます」は冗長。「報告します」で足りる
-```
-
-同義の三項列挙（ユーザー体験・運用コスト・拡張性）と二項対立の定型（「インフラではない。運用設計だ。本質がある」）は、〔助言〕に残さず修正文から削っている。削ったのは検証できない期待効果と転換演出で、実施済みの対応と現状の報告は残している。
-
-意味・数値に関わる指摘を先頭に置き、表記の指摘を後ろに回す。「大幅に」と「先日」は意味に関わるため、修正せず確認事項として残している。
-
-## 参考資料
-
-各資料をスキルにどう反映したかは [docs/design/rationale.md](docs/design/rationale.md) に記載する。
-文書構成の規則の根拠は [docs/design/document-structure-research.md](docs/design/document-structure-research.md) にまとめた。
-効果検証は [docs/evals/](docs/evals/) を参照する。
-
-### 日本語の文章規範
-
-- 在留支援のためのやさしい日本語ガイドライン（出入国在留管理庁・文化庁, 2020）
-  掲載ページ: https://www.bunka.go.jp/seisaku/kokugo_nihongo/kyoiku/92484001.html
-  PDF: https://www.bunka.go.jp/seisaku/kokugo_nihongo/kyoiku/pdf/93869301_01.pdf
-- 柴崎秀子（2014）「リーダビリティー研究と「やさしい日本語」」日本語教育 158, pp.49-65
-  https://doi.org/10.20721/nihongokyoiku.158.0_49
-- 村田匡輝, 大野誠寛, 松原茂樹（2010）「日本語テキストにおける読点位置の検出」言語処理学会年次大会発表論文集
-  PDF: https://www.anlp.jp/proceedings/annual_meeting/2010/pdf_dir/D3-7.pdf
-  リポジトリ: https://nagoya.repo.nii.ac.jp/records/13301
-- k16shikano / japanese-tech-writing（Unlicense）
-  https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
-- k16shikano / cognitive-rhythm-writing（Unlicense）
-  https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432
-
-### ツール
-
-- textlint
-  リポジトリ: https://github.com/textlint/textlint
-  公式サイト: https://textlint.org/
-
-### 類似スキル
-
-- Forest-Project-Lab / jp-writing-skills（MIT）
-  https://github.com/Forest-Project-Lab/jp-writing-skills
-- sanoakr / ai-skills（`ja-proofreading`）
-  https://github.com/sanoakr/ai-skills
-- ultimatile / dotfiles（`.claude/skills/japanese-writing`）
-  https://github.com/ultimatile/dotfiles
-- mathbullet / skills（`ja-text-communication`）
-  https://github.com/mathbullet/skills/blob/main/plugins/ja-text-communication/skills/ja-text-communication/SKILL.md
-- hardikpandya / stop-slop（MIT）
-  https://github.com/hardikpandya/stop-slop
-  AI 定型の除去。日本語で再現する構造パターンを `claude-tics.md` に取り込み済み。副詞全面禁止・採点制・リズム固定は採っていない（[docs/design/rationale.md](docs/design/rationale.md)）
-
-### 言語モデルの音韻能力
-
-- Suvarna, A., Khandelwal, H., & Peng, N. (2024) PhonologyBench: Evaluating Phonological Skills of Large Language Models
-  https://arxiv.org/abs/2404.02456
-
-### 採用しなかった資料
-
-- 「テキストの多様性をとらえる分類指標の体系化の試み（2）」言語処理学会年次大会 2012, P2-2
-  https://www.anlp.jp/proceedings/annual_meeting/2012/pdf_dir/P2-2.pdf
-- 「小説における文体印象解析の試み」言語処理学会年次大会 2008, A2-1
-  https://www.anlp.jp/proceedings/annual_meeting/2008/pdf_dir/A2-1.pdf
-- 「統計分析からみた水村美苗著『続明暗』の文体模倣」計量国語学 32(1)
-  https://www.jstage.jst.go.jp/article/mathling/32/1/32_19/_article/-char/ja/
+MIT
