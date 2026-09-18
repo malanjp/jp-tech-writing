@@ -1,11 +1,11 @@
 {
   "name": "tired-dev",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約",
   "license": "MIT",
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test \"test/**/*.test.js\"",
     "lint": "node tools/lint.js SKILL.md rules/anchor.md rules/chat.md README.md"
   }
 }
