@@ -24,9 +24,9 @@ test('抽象的な警告を検出する', () => {
   assert.ok(!ruleIds('呼び出し元 3 箇所で型が合わなくなる。').includes('vague-why'));
 });
 
-test('全角かっこと全角コロンを検出する', () => {
-  assert.ok(ruleIds('対象は 3 件（未確認）である。').includes('fullwidth-paren'));
-  assert.ok(!ruleIds('対象は 3 件 (未確認) である。').includes('fullwidth-paren'));
+test('規約にない項目は検出しない', () => {
+  // 全角かっこは CLAUDE.md の表記ルールであって、規約 (SKILL.md) の規則ではない。
+  assert.deepEqual(lintText('対象は 3 件（未確認）である。'), []);
 });
 
 test('漢字の連結を検出する', () => {
@@ -43,6 +43,45 @@ test('長い文を検出する', () => {
   const long = `${'この処理は入力を検証してから保存する'.repeat(8)}。`;
   assert.ok(ruleIds(long).includes('long-sentence'));
   assert.ok(!ruleIds('この処理は入力を検証してから保存する。').includes('long-sentence'));
+});
+
+test('後方参照を検出する', () => {
+  assert.ok(ruleIds('上記の関数で落ちる。').includes('back-reference'));
+  assert.ok(ruleIds('前述のとおり再現する。').includes('back-reference'));
+  assert.ok(!ruleIds('`parseOrgId()` で落ちる。').includes('back-reference'));
+});
+
+test('並列する項目の文末の混在を検出する', () => {
+  const mixed = ['- 入力を検証する', '- 保存する', '- 結果の通知'].join('\n');
+  const allSentence = ['- 入力を検証する', '- 保存する', '- 結果を通知する'].join('\n');
+  const allNoun = ['- 入力の検証', '- 保存', '- 結果の通知'].join('\n');
+  assert.ok(ruleIds(mixed).includes('parallel-style'));
+  assert.ok(!ruleIds(allSentence).includes('parallel-style'));
+  assert.ok(!ruleIds(allNoun).includes('parallel-style'));
+});
+
+test('ラベル付きの属性リストは文末の混在を見ない', () => {
+  const labelled = [
+    '- **契機**: 障害の調査 (2026-09-10 発生)',
+    '- **事実**: `catch` 節が `return null` だけを実行する。',
+    '- **対応方針**: 例外を呼び出し元へ伝える。',
+  ].join('\\n');
+  assert.ok(!ruleIds(labelled).includes('parallel-style'));
+});
+
+test('2 項目だけの並びは文末の混在を見ない', () => {
+  const twoItems = ['- 入力を検証する', '- 結果の通知'].join('\n');
+  assert.ok(!ruleIds(twoItems).includes('parallel-style'));
+});
+
+test('句点で終わる項目と動詞で終わる項目は同じ文末止めとみなす', () => {
+  const mixedButSame = ['- 入力を検証する。', '- 保存する', '- 結果を通知する。'].join('\n');
+  assert.ok(!ruleIds(mixedButSame).includes('parallel-style'));
+});
+
+test('インデントが違う箇条書きは別の並びとして数える', () => {
+  const nested = ['- 検証する', '  - 入力の形式', '  - 値の範囲', '  - 権限の確認', '- 保存する'].join('\n');
+  assert.ok(!ruleIds(nested).includes('parallel-style'));
 });
 
 test('箇条書きの 3 階層目を検出する', () => {

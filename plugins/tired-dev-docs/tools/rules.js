@@ -3,6 +3,10 @@
 // 受動態の判別、事実と仮説の分離、見出しの具体性、「なぜ問題か」がメカニズムで
 // 書かれているかは、正規表現では偽陽性が多くなるため意図的に入れていない。
 // それらは人のレビューか、生成物どうしの比較で見る。
+//
+// 規約 (SKILL.md) に書かれていない項目も置かない。
+// かつて全角かっこの検出を置いていたが、規約に対応する規則がなく、
+// 違反件数の 9 割をこの 1 項目が占めて、規約の効果を測れなくしていた。
 
 // 本文行だけを見る規則が使う判定。コードブロックと表と引用は対象外にする。
 const SKIP_LINE = /^(\s*\||\s*>|\s*```)/;
@@ -30,12 +34,6 @@ const rules = [
     test: (line) => matchAll(line, /保守性が下がる|可読性が下がる|パフォーマンスに悪影響|品質が低下/g),
   },
   {
-    id: 'fullwidth-paren',
-    section: '表記',
-    message: '全角かっこと全角コロンを使わず、半角に統一する',
-    test: (line) => matchAll(line, /[（）：]/g),
-  },
-  {
     id: 'kanji-run',
     section: '5-⑤',
     message: '漢字が 6 文字以上続く複合語を分解する',
@@ -48,6 +46,12 @@ const rules = [
     // 機械判定では 4 つ以上だけを違反とする。
     message: '「の」が 4 つ以上続く修飾を分解する',
     test: (line) => matchAll(line, /(?:[^\s、。]{1,8}の){4,}/g),
+  },
+  {
+    id: 'back-reference',
+    section: '5-③',
+    message: '「上記」「前述」等を使わず、対象を再掲する',
+    test: (line) => matchAll(line, /上記|下記|前述|後述|上述|先述|前掲/g),
   },
   {
     id: 'double-negative',
@@ -79,6 +83,26 @@ const rules = [
 
 // 文書全体を見る規則。行単位では判定できないものを置く。
 const documentRules = [
+  {
+    id: 'parallel-style',
+    section: '5-⑥',
+    message: '並列する項目で体言止めと文末止めを混ぜない',
+    test: (lines) => {
+      const hits = [];
+      for (const block of listBlocks(lines)) {
+        // 2 項目だけの並びは偶然の混在が多いため、3 項目以上だけを見る。
+        if (block.length < 3) continue;
+        // ラベル付きの属性リストは並列の列挙ではないため、文末を揃える対象から外す。
+        if (block.filter((item) => LABELLED.test(item.text)).length * 2 >= block.length) continue;
+        const styles = new Set(block.map((item) => endingStyle(item.text)));
+        styles.delete('unknown');
+        if (styles.size > 1) {
+          hits.push({ line: block[0].no, found: `${block.length} 項目で文末が揃っていない` });
+        }
+      }
+      return hits;
+    },
+  },
   {
     id: 'list-depth',
     section: '1-③',
@@ -133,6 +157,51 @@ const documentRules = [
 
 function matchAll(line, re) {
   return (line.match(re) || []).map((s) => s.slice(0, 24));
+}
+
+// 「**事実**: 〜」のように、ラベルと値を並べた項目を見分ける。
+// 規約 1-④ が求める情報種別の分離はこの形になるため、文末の統一は求めない。
+const LABELLED = /^\*\*[^*]+\*\*\s*[:：]/;
+
+// 同じインデント幅で続く箇条書きを 1 つの並びとして取り出す。
+// 空行、見出し、コードブロックで区切る。子リストは別の並びとして扱う。
+function listBlocks(lines) {
+  const blocks = [];
+  const open = new Map();
+  const close = (indent) => {
+    if (open.has(indent)) {
+      blocks.push(open.get(indent));
+      open.delete(indent);
+    }
+  };
+  for (const { text, no, inCode } of lines) {
+    if (inCode || /^#{1,6} /.test(text) || !text.trim()) {
+      for (const indent of [...open.keys()]) close(indent);
+      continue;
+    }
+    const m = text.match(/^(\s*)(?:[-*+]|\d+\.) (.+)$/);
+    if (!m) continue;
+    const indent = m[1].length;
+    if (!open.has(indent)) open.set(indent, []);
+    open.get(indent).push({ text: m[2].trim(), no });
+  }
+  for (const indent of [...open.keys()]) close(indent);
+  return blocks;
+}
+
+// 項目の終わり方を、文末止めと体言止めの 2 つに分ける。
+// 句点があるか、動詞や形容詞で終われば文末止め、名詞で終われば体言止めとする。
+function endingStyle(text) {
+  // 末尾のインラインコードは中身を見ずに 1 語として扱う。
+  const body = text.replace(/`[^`]*`/g, 'X').replace(/\s+$/, '');
+  if (/[。]$/.test(body)) return 'sentence';
+  // 句点がない場合、動詞の終止形はウ段のかなで終わる。形容詞は「い」で終わる。
+  if (/[うくぐすずつづぬふぶぷむる]$/.test(body)) return 'sentence';
+  if (/(?:ない|よい|らしい|しい|だ|た)$/.test(body)) return 'sentence';
+  // 助詞や読点で終わる行は、項目として完結していないので判定しない。
+  if (/[:：|、はがをにでとも]$/.test(body)) return 'unknown';
+  if (/[぀-ゟ]$/.test(body)) return 'unknown';
+  return 'noun';
 }
 
 // 「。」で切る。ただしコード中のピリオドは対象外なので全角句点だけを見る。
