@@ -24,9 +24,9 @@ test('抽象的な警告を検出する', () => {
   assert.ok(!ruleIds('呼び出し元 3 箇所で型が合わなくなる。').includes('vague-why'));
 });
 
-test('全角かっこと全角コロンを検出する', () => {
-  assert.ok(ruleIds('対象は 3 件（未確認）である。').includes('fullwidth-paren'));
-  assert.ok(!ruleIds('対象は 3 件 (未確認) である。').includes('fullwidth-paren'));
+test('規約にない項目は検出しない', () => {
+  // 全角かっこは CLAUDE.md の表記ルールであって、規約 (SKILL.md) の規則ではない。
+  assert.deepEqual(lintText('対象は 3 件（未確認）である。'), []);
 });
 
 test('漢字の連結を検出する', () => {
