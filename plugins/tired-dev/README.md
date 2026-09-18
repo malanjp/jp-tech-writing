@@ -46,14 +46,33 @@ cp -r /tmp/malanjp-skills/plugins/tired-dev ~/.claude/skills/tech-writing
 
 規約は短いチャット返答を対象外とする。
 ただし語彙の禁止と認知負荷の低減は、文の長さや口調と独立しており、短く書いても守れる。
-この 2 つだけを返答にも効かせたい場合は、環境変数を設定する。
+この 2 つだけを返答にも効かせたい場合は、環境変数 `TIRED_DEV_CHAT` を設定する。
+`1`、`on`、`true`、`yes` のいずれかで有効になる。
+設定しなければ無効で、フックの出力は変わらない。
+
+設定する方法は `settings.json` に書くか、シェルで `export` するかの 2 つである。
+すべてのプロジェクトで常に効かせるなら `settings.json` を勧める。
+IDE 拡張やデスクトップアプリから起動した場合にも効くためである。
+
+`~/.claude/settings.json` に書く。
+
+```json
+{
+  "env": {
+    "TIRED_DEV_CHAT": "1"
+  }
+}
+```
+
+シェルの設定ファイルに書く方法もある。
+この場合、そのシェルから起動した Claude Code だけで効く。
 
 ```bash
 export TIRED_DEV_CHAT=1
 ```
 
-`1`、`on`、`true`、`yes` のいずれかで有効になる。
-設定しなければ無効で、フックの出力は変わらない。
+リポジトリごとに切り替えるなら、そのリポジトリの `.claude/settings.json` に同じ `env` を書く。
+チームに共有せず自分だけで使うなら `.claude/settings.local.json` に書く。
 
 有効にすると `SessionStart` が `rules/chat.md` を追加で注入する。
 持ち込むのは語彙と認知負荷だけで、BLUF、見出し、テーブル、検証コマンド、受け入れ条件は持ち込まない。
