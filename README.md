@@ -26,6 +26,20 @@ CLI を使わない場合は、エージェントがスキルを読むディレ�
 git clone git@github.com:malanjp/jp-tech-writing.git ~/.claude/skills/jp-tech-writing
 ```
 
+## Claude Code のセッション全体に適用する
+
+スキルはモデルが必要と判断したときだけ読み込まれる。
+セッションの後半でドリフトさせたくない場合は、プラグインとして導入する。
+`SessionStart` フックが適用対象を通知し、`UserPromptSubmit` フックが共有文章の作成・推敲依頼を検出したときだけ `rules/anchor.md` を注入する。
+
+```
+/plugin marketplace add malanjp/jp-tech-writing
+/plugin install jp-tech-writing@malanjp
+```
+
+チャット返答の口調には干渉しない。
+ゲートに該当しないプロンプトでは何も注入しないため、通常の会話のトークンは増えない。
+
 ## 使い方
 
 報告、Issue 起票、レビュー指摘、推敲を依頼すると自動で参照される。
