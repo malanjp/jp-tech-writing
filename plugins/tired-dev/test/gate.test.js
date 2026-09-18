@@ -111,3 +111,24 @@ test('SessionStart は適用対象と正本のパスを通知する', () => {
   assert.ok(out.includes('SKILL.md'), '正本のパスが含まれていない');
   assert.ok(out.includes('anchor.md'), '要約のパスが含まれていない');
 });
+
+test('TIRED_DEV_CHAT が無効なら、チャット向けの規則を出さない', () => {
+  const dir = makeConfigDir();
+  for (const value of ['', '0', 'off', 'false', 'no', 'まる']) {
+    const out = runHook('activate', {}, dir, { TIRED_DEV_CHAT: value });
+    assert.ok(!out.includes('チャット返答にも効かせる規則'), `値 ${JSON.stringify(value)} で注入された`);
+  }
+});
+
+test('TIRED_DEV_CHAT が有効なら、語彙と認知負荷だけを足す', () => {
+  const dir = makeConfigDir();
+  for (const value of ['1', 'on', 'true', 'YES', ' On ']) {
+    const out = runHook('activate', {}, dir, { TIRED_DEV_CHAT: value });
+    assert.ok(out.includes('チャット返答にも効かせる規則'), `値 ${JSON.stringify(value)} で注入されなかった`);
+  }
+  const out = runHook('activate', {}, dir, { TIRED_DEV_CHAT: '1' });
+  assert.ok(out.includes('正典'), '語彙の表が含まれていない');
+  assert.ok(out.includes('二重否定'), '認知負荷の項目が含まれていない');
+  assert.ok(!out.includes('受け入れ条件のチェックボックス'), '文書の形式まで持ち込んでいる');
+  assert.ok(out.startsWith('tired-dev:tech-writing 有効。'), '通常の通知が先頭から消えている');
+});

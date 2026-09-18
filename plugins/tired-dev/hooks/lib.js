@@ -1,5 +1,5 @@
 // tired-dev フック共通処理
-// stdin の JSON 読み取りと、アンカーファイルの読み込みを提供する。
+// stdin の JSON 読み取りと、規則ファイルの読み込みを提供する。
 
 const fs = require('fs');
 const path = require('path');
@@ -20,12 +20,24 @@ function readInput() {
   }
 }
 
-function readAnchor() {
+// rules/ 配下のファイルを読む。無ければ null を返し、フックは通知を続ける。
+function readRule(name) {
   try {
-    return fs.readFileSync(ANCHOR_PATH, 'utf8').trim();
+    return fs.readFileSync(path.join(ROOT, 'rules', name), 'utf8').trim();
   } catch {
     return null;
   }
 }
 
-module.exports = { ROOT, ANCHOR_PATH, readInput, readAnchor };
+function readAnchor() {
+  return readRule('anchor.md');
+}
+
+// チャット返答にも語彙と認知負荷を効かせるかどうか。
+// 既定は無効で、環境変数を明示的に有効な値にしたときだけ有効になる。
+function chatGateEnabled(env = process.env) {
+  const value = String(env.TIRED_DEV_CHAT ?? '').trim().toLowerCase();
+  return ['1', 'on', 'true', 'yes'].includes(value);
+}
+
+module.exports = { ROOT, ANCHOR_PATH, readInput, readRule, readAnchor, chatGateEnabled };

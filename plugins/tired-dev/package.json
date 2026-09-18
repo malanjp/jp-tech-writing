@@ -6,6 +6,6 @@
   "license": "MIT",
   "scripts": {
     "test": "node --test test/",
-    "lint": "node tools/lint.js SKILL.md rules/anchor.md README.md"
+    "lint": "node tools/lint.js SKILL.md rules/anchor.md rules/chat.md README.md"
   }
 }
