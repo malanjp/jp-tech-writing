@@ -56,11 +56,14 @@ function bumpHitCount(sessionId) {
   } catch {
     state = {};
   }
+  const next = (state[sessionId] || 0) + 1;
+  // 現在のセッションを末尾へ置き直してから切り詰める。
+  // 先に切り詰めると、追加した 1 件が上限を 1 つ超えて残る。
+  delete state[sessionId];
+  state[sessionId] = next;
   const entries = Object.entries(state);
   // 状態ファイルが無限に育たないよう、直近 20 セッション分だけ残す。
   const trimmed = entries.length > 20 ? Object.fromEntries(entries.slice(-20)) : state;
-  const next = (trimmed[sessionId] || 0) + 1;
-  trimmed[sessionId] = next;
   try {
     fs.writeFileSync(file, JSON.stringify(trimmed), 'utf8');
   } catch {
