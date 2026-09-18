@@ -6,18 +6,24 @@
   },
   "plugins": [
     {
-      "name": "jp-tech-writing",
-      "source": "./",
-      "description": "報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントを日本語で書くための記述規約。",
+      "name": "tired-dev-docs",
+      "source": "./plugins/tired-dev-docs",
+      "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。報告、Issue 起票文、PR の description、レビュー指摘、調査レポートに適用する。",
       "version": "0.1.0",
       "author": {
         "name": "malanjp",
         "url": "https://github.com/malanjp"
       },
-      "homepage": "https://github.com/malanjp/jp-tech-writing",
+      "homepage": "https://github.com/malanjp/skills",
       "license": "MIT",
       "category": "productivity",
-      "keywords": ["japanese", "writing", "technical-writing", "code-review"]
+      "keywords": [
+        "japanese",
+        "writing",
+        "technical-writing",
+        "code-review",
+        "cognitive-load"
+      ]
     }
   ]
 }

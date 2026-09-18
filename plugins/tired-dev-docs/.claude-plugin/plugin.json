@@ -1,19 +1,20 @@
 {
-  "name": "jp-tech-writing",
+  "name": "tired-dev-docs",
   "version": "0.1.0",
-  "description": "報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントを日本語で書くための記述規約。SessionStart で適用対象を通知し、UserPromptSubmit が共有文章の作成・推敲依頼を検出したときだけ要約を注入する。チャット返答の口調には干渉しない。規約の正本は SKILL.md。",
+  "description": "疲れたエンジニアが一読で理解できる日本語の技術文書を書くための規約。SessionStart で適用対象を通知し、UserPromptSubmit が共有文章の作成・推敲依頼を検出したときだけ要約を注入する。チャット返答の口調には干渉しない。規約の正本は SKILL.md。",
   "author": {
     "name": "malanjp",
     "url": "https://github.com/malanjp"
   },
-  "homepage": "https://github.com/malanjp/jp-tech-writing",
-  "repository": "https://github.com/malanjp/jp-tech-writing",
+  "homepage": "https://github.com/malanjp/skills",
+  "repository": "https://github.com/malanjp/skills",
   "license": "MIT",
   "keywords": [
     "japanese",
     "日本語",
     "writing",
     "technical-writing",
+    "cognitive-load",
     "proofreading",
     "issue",
     "code-review",
@@ -28,7 +29,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/activate.js\"",
             "timeout": 5,
-            "statusMessage": "jp-tech-writing 読込中..."
+            "statusMessage": "tired-dev-docs 読込中..."
           }
         ]
       }
@@ -40,7 +41,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/gate.js\"",
             "timeout": 5,
-            "statusMessage": "jp-tech-writing 判定中..."
+            "statusMessage": "tired-dev-docs 判定中..."
           }
         ]
       }

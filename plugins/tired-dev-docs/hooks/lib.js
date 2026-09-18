@@ -1,4 +1,4 @@
-// jp-tech-writing フック共通処理
+// tired-dev-docs フック共通処理
 // stdin の JSON 読み取りと、アンカーファイルの読み込みを提供する。
 
 const fs = require('fs');
