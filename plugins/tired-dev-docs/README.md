@@ -75,9 +75,15 @@ node tools/score.js draft.md --expect bluf,file-ref,run-command
 
 ```bash
 # 前提: plugins/tired-dev-docs で実行。claude CLI と課金が必要
-node eval/run.js --model sonnet
-node eval/run.js --report          # 生成済みの出力を採点し直す
+node eval/run.js --runs 5 --model sonnet   # 各条件 5 回ずつ生成する
+node eval/run.js --report                  # 生成済みの出力を採点し直す
 ```
+
+生成は毎回ぶれる。1 回の実行では差が逆転することもあるため、`--runs` で試行を重ね、
+中央値と最小 - 最大で読む。同時実行数は `--concurrency` で変える。初期値は 4 である。
+
+判断には違反件数より「要素ごとの出現回数」を見る。
+違反件数は表記の統一が大半を占め、文章の質を代表しない。
 
 生成は必ずリポジトリの外の一時ディレクトリで走らせる。
 同じ作業ツリーで走らせると、このリポジトリ向けのフックが子プロセスの `claude` に効き、
