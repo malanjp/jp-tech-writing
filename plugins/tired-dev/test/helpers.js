@@ -15,12 +15,13 @@ function makeConfigDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'tired-dev-test-'));
 }
 
-function runHook(hookName, input, configDir) {
+function runHook(hookName, input, configDir, env = {}) {
   const script = path.join(PLUGIN_ROOT, 'hooks', `${hookName}.js`);
   return execFileSync(process.execPath, [script], {
     input: JSON.stringify(input),
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_CONFIG_DIR: configDir },
+    // TIRED_DEV_CHAT は呼び出し側の環境に左右させない。テストで明示的に渡す。
+    env: { ...process.env, TIRED_DEV_CHAT: '', CLAUDE_CONFIG_DIR: configDir, ...env },
   });
 }
 
