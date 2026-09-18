@@ -1,0 +1,12 @@
+{
+  "name": "malanjp-skills",
+  "version": "0.0.0",
+  "private": true,
+  "description": "malanjp が使う Claude Code プラグインとスキルのワークスペース",
+  "license": "MIT",
+  "packageManager": "pnpm@11.20.0",
+  "scripts": {
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  }
+}

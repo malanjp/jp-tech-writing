@@ -90,8 +90,8 @@ export TIRED_DEV_CHAT=1
 
 ```bash
 # 前提: plugins/tired-dev で実行
-npm test          # フックの判定と規約チェッカのテスト
-npm run lint      # 規約本体が自身の規約を満たすかの検査
+pnpm test         # フックの判定と規約チェッカのテスト
+pnpm lint         # 規約本体が自身の規約を満たすかの検査
 ```
 
 `tools/lint.js` は書いてはいけない表現を検出する。
