@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// jp-tech-writing — SessionStart フック
+// tired-dev-docs — SessionStart フック
 //
 // セッション開始時に、スキルの発火条件だけを短く通知する。
 // 規約の全文はここで注入しない。UserPromptSubmit のゲートが命中したときに
@@ -12,7 +12,7 @@ readInput();
 
 process.stdout.write(
   [
-    'jp-tech-writing 有効。日本語の技術文章の記述規約。',
+    'tired-dev-docs 有効。日本語の技術文章の記述規約。',
     '',
     '適用対象: 報告、調査結果、Issue 起票文、PR の description とレビュー指摘、',
     'docs 配下の Markdown、ADR、README、仕様書、障害報告、リリースノート。',
@@ -21,7 +21,7 @@ process.stdout.write(
     '適用しない対象: 短いチャット返答、確認質問、コードとコマンドの出力、',
     'エッセイや SNS 投稿などの技術報告以外の文章。',
     '',
-    '上記に該当する文章を書く前に、jp-tech-writing の規約を読んでから書く。',
+    '上記に該当する文章を書く前に、tired-dev-docs の規約を読んでから書く。',
     `規約の正本: ${path.join(ROOT, 'SKILL.md')}`,
     `要約: ${path.join(ROOT, 'rules', 'anchor.md')}`,
   ].join('\n')
