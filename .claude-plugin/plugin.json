@@ -1,0 +1,49 @@
+{
+  "name": "jp-tech-writing",
+  "version": "0.1.0",
+  "description": "報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントを日本語で書くための記述規約。SessionStart で適用対象を通知し、UserPromptSubmit が共有文章の作成・推敲依頼を検出したときだけ要約を注入する。チャット返答の口調には干渉しない。規約の正本は SKILL.md。",
+  "author": {
+    "name": "malanjp",
+    "url": "https://github.com/malanjp"
+  },
+  "homepage": "https://github.com/malanjp/jp-tech-writing",
+  "repository": "https://github.com/malanjp/jp-tech-writing",
+  "license": "MIT",
+  "keywords": [
+    "japanese",
+    "日本語",
+    "writing",
+    "technical-writing",
+    "proofreading",
+    "issue",
+    "code-review",
+    "hooks",
+    "skills"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/activate.js\"",
+            "timeout": 5,
+            "statusMessage": "jp-tech-writing 読込中..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/gate.js\"",
+            "timeout": 5,
+            "statusMessage": "jp-tech-writing 判定中..."
+          }
+        ]
+      }
+    ]
+  }
+}

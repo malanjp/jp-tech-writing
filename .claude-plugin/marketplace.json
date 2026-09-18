@@ -1,0 +1,23 @@
+{
+  "name": "malanjp",
+  "owner": {
+    "name": "malanjp",
+    "url": "https://github.com/malanjp"
+  },
+  "plugins": [
+    {
+      "name": "jp-tech-writing",
+      "source": "./",
+      "description": "報告、タスク仕様、Issue 起票文、コードレビュー指摘、調査結果、PR コメントを日本語で書くための記述規約。",
+      "version": "0.1.0",
+      "author": {
+        "name": "malanjp",
+        "url": "https://github.com/malanjp"
+      },
+      "homepage": "https://github.com/malanjp/jp-tech-writing",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": ["japanese", "writing", "technical-writing", "code-review"]
+    }
+  ]
+}
