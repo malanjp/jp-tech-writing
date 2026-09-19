@@ -14,6 +14,19 @@ function ruleIds(text) {
   return lintText(text).map((f) => f.rule);
 }
 
+test('語彙表の禁止語を検出する', () => {
+  assert.ok(ruleIds('設定が全プロジェクトに効く。').includes('jargon'));
+  assert.ok(ruleIds('フックを効かせる。').includes('jargon'));
+  assert.ok(ruleIds('包括的なテストを書く。').includes('jargon'));
+  // 「効」を含む別語を巻き込まない。
+  assert.ok(!ruleIds('規約の効果を測る。').includes('jargon'));
+  assert.ok(!ruleIds('設定を有効にする。').includes('jargon'));
+  assert.ok(!ruleIds('処理を無効にする。').includes('jargon'));
+  assert.ok(!ruleIds('効率を上げる。').includes('jargon'));
+  // 禁止語を引用して説明する文は違反にしない。
+  assert.ok(!ruleIds('「効く」は使わず「適用する」と書く。').includes('jargon'));
+});
+
 test('曖昧な数量詞を検出する', () => {
   assert.ok(ruleIds('多くのテストが失敗した。').includes('vague-quantifier'));
   assert.ok(!ruleIds('12 件のテストが失敗した。').includes('vague-quantifier'));
