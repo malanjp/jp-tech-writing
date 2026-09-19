@@ -98,7 +98,7 @@ test('接続詞の連鎖を検出する', () => {
   assert.ok(!ruleIds(twice).includes('conjunction-chain'));
 });
 
-test('BLUF の欠落を検出する', () => {
+test('要約の欠落を検出する', () => {
   const noBluf = ['# 調査結果', '', '## 背景', '', '調査した。'].join('\n');
   const withBluf = ['# 調査結果', '', '結論は 3 件の不整合である。', '', '## 背景'].join('\n');
   assert.ok(ruleIds(noBluf).includes('bluf-missing'));
