@@ -59,7 +59,8 @@ const checks = {
   },
   table: {
     label: '属性のテーブル化',
-    test: (text) => /^\s*\|.+\|\s*$/m.test(text) && /^\s*\|[\s:-]+\|\s*$/m.test(text),
+    // 区切り行は列数ぶん `|---|` が並ぶ。1 列でも複数列でも一致させる。
+    test: (text) => /^\s*\|.+\|\s*$/m.test(text) && /^\s*\|(?:\s*:?-+:?\s*\|)+\s*$/m.test(text),
   },
   quantified: {
     label: '定量的な記述',
