@@ -33,7 +33,7 @@ function readAnchor() {
   return readRule('anchor.md');
 }
 
-// チャット返答にも語彙と認知負荷を効かせるかどうか。
+// チャット返答にも語彙と認知負荷を適用するかどうか。
 // 既定は無効で、環境変数を明示的に有効な値にしたときだけ有効になる。
 function chatGateEnabled(env = process.env) {
   const value = String(env.TIRED_DEV_CHAT ?? '').trim().toLowerCase();

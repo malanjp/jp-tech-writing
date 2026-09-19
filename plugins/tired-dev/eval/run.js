@@ -47,8 +47,8 @@ function buildPrompt(condition, caseText) {
 }
 
 // 生成は必ずリポジトリの外で走らせる。
-// 同じ作業ツリーで走らせると、このリポジトリ向けのフックやプロジェクト設定が
-// 子プロセスの claude に効き、ブロックメッセージが生成物に混ざる。
+// 同じ作業ツリーで走らせると、このリポジトリ向けのフックやプロジェクト設定を
+// 子プロセスの claude が読み込み、ブロックメッセージが生成物に混ざる。
 async function generate(prompt, model) {
   const args = ['-p', prompt, '--restricted'];
   if (model) args.push('--model', model);

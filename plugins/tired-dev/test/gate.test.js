@@ -116,7 +116,7 @@ test('TIRED_DEV_CHAT が無効なら、チャット向けの規則を出さな�
   const dir = makeConfigDir();
   for (const value of ['', '0', 'off', 'false', 'no', 'まる']) {
     const out = runHook('activate', {}, dir, { TIRED_DEV_CHAT: value });
-    assert.ok(!out.includes('チャット返答にも効かせる規則'), `値 ${JSON.stringify(value)} で注入された`);
+    assert.ok(!out.includes('チャット返答にも適用する規則'), `値 ${JSON.stringify(value)} で注入された`);
   }
 });
 
@@ -124,7 +124,7 @@ test('TIRED_DEV_CHAT が有効なら、語彙と認知負荷だけを足す', ()
   const dir = makeConfigDir();
   for (const value of ['1', 'on', 'true', 'YES', ' On ']) {
     const out = runHook('activate', {}, dir, { TIRED_DEV_CHAT: value });
-    assert.ok(out.includes('チャット返答にも効かせる規則'), `値 ${JSON.stringify(value)} で注入されなかった`);
+    assert.ok(out.includes('チャット返答にも適用する規則'), `値 ${JSON.stringify(value)} で注入されなかった`);
   }
   const out = runHook('activate', {}, dir, { TIRED_DEV_CHAT: '1' });
   assert.ok(out.includes('正典'), '語彙の表が含まれていない');
